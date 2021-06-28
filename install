@@ -2,10 +2,9 @@
 
 echo "Installing Discord..."
 cd $HOME
-git clone https://github.com/oxmc/disweb
-cd disweb
+https://github.com/oxmc/disweb/releases/download/Test/Discord.zip
 sudo apt install -y unzip
-sudo unzip $HOME/disweb/Discord.zip -d /usr/share
+sudo unzip $HOME/Discord.zip -d /usr/share
 echo "[Desktop Entry]
 Name=Discord for raspberry pi's
 Exec=/usr/share/Discord/Discord-webapp
@@ -18,5 +17,5 @@ Categories=Network;InstantMessaging;Utility;
 Encoding=UTF-8" > $HOME/.local/share/applications/Discord.desktop
 echo "Discord is now installed!"
 cd $HOME
-rm -rf disweb
+rm -rf Discord.zip
 echo "You can find Discord in Menu > Accessories > Discord for raspbery pi's."
