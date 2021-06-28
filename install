@@ -5,8 +5,8 @@ cd $HOME
 git clone https://github.com/oxmc/disweb
 cd disweb
 sudo apt install -y unzip
-mkdir -p /usr/share/Discord
-unzip /usr/share/Discord $HOME/disweb/Discord.zip
+sudo mkdir -p /usr/share/Discord
+sudo unzip /usr/share/Discord $HOME/disweb/Discord.zip
 sudo echo "[Desktop Entry]
 Name=Discord for raspberry pi's
 Exec=/usr/share/Discord/Discord-webapp
