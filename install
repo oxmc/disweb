@@ -6,8 +6,8 @@ git clone https://github.com/oxmc/disweb
 cd disweb
 sudo apt install -y unzip
 sudo mkdir -p /usr/share/Discord
-sudo unzip $HOME/disweb/Discord.zip /usr/share/Discord
-sudo echo "[Desktop Entry]
+sudo unzip $HOME/disweb/Discord.zip -d /usr/share/Discord
+echo "[Desktop Entry]
 Name=Discord for raspberry pi's
 Exec=/usr/share/Discord/Discord-webapp
 Icon=/usr/share/Discord/resources/app/src/icons/app.png
@@ -16,7 +16,7 @@ GenericName=Internet Messenger
 Type=Application
 StartupNotify=true
 Categories=Network;InstantMessaging;Utility;
-Encoding=UTF-8" > /usr/share/applications/Discord.desktop
+Encoding=UTF-8" | sudo tee /usr/share/applications/Discord.desktop
 echo "Discord is now installed!"
 cd $HOME
 rm -rf disweb
