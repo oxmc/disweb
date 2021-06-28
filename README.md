@@ -1,12 +1,12 @@
 # disweb
 
-#Install:
+# Install:
 
 ```sh
 wget -qO - https://raw.githubusercontent.com/oxmc/disweb/main/install | bash
 ```
 
-#Uninstall:
+# Uninstall:
 
 ```sh
 wget -qO - https://raw.githubusercontent.com/oxmc/disweb/main/uninstall | bash
