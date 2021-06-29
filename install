@@ -2,7 +2,7 @@
 
 echo "Installing Discord..."
 cd $HOME
-https://github.com/oxmc/disweb/releases/download/Test/Discord.zip
+wget https://github.com/oxmc/disweb/releases/download/Test/Discord.zip
 sudo apt install -y unzip
 sudo unzip $HOME/Discord.zip -d /usr/share
 echo "[Desktop Entry]
