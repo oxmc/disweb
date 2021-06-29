@@ -6,7 +6,7 @@ wget https://github.com/oxmc/disweb/releases/download/Discord-armv7l/Discord.zip
 sudo apt install -y unzip
 sudo unzip $HOME/Discord.zip -d $HOME/.local/share
 echo "[Desktop Entry]
-Name=Discord for raspberry pi's
+Name=Disweb
 Exec=$HOME/.local/share/Discord-webapp-linux-armv7l/Discord-webapp
 Icon=$HOME/.local/share/Discord-webapp-linux-armv7l/resources/app/src/icons/app.png
 Terminal=false
