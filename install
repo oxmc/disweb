@@ -17,5 +17,5 @@ Categories=Network;InstantMessaging;Utility;
 Encoding=UTF-8" > $HOME/.local/share/applications/Discord.desktop
 echo "Discord is now installed!"
 cd $HOME
-rm -rf Discord.zip
+rm -rf $HOME/Discord.zip
 echo "You can find Discord in Menu > Accessories > Discord for raspbery pi's."
