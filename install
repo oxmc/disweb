@@ -7,8 +7,8 @@ sudo apt install -y unzip
 sudo unzip $HOME/Discord.zip -d $HOME/.local/share
 echo "[Desktop Entry]
 Name=Discord for raspberry pi's
-Exec=$HOME/.local/share/Discord/Discord-webapp
-Icon=$HOME/.local/share/Discord/resources/app/src/icons/app.png
+Exec=$HOME/.local/share/Discord-webapp-linux-armv7l/Discord-webapp
+Icon=$HOME/.local/share/Discord-webapp-linux-armv7l/resources/app/src/icons/app.png
 Terminal=false
 GenericName=Internet Messenger
 Type=Application
