@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Uninstalling Discord..."
+echo "Uninstalling DisWeb..."
 sudo rm -rf $HOME/.local/share/Discord-webapp-linux-armv7l
 sudo rm -rf $HOME/.local/share/applications/Discord.desktop
 echo "Done!"
