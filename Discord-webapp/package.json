@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "electron-packager": "^15.2.0",
+    "electron-widevinecdm": "^7.0.0",
     "node-notifier": "^9.0.1",
     "request": "^2.88.2",
     "reuest": "^0.0.1-security"
