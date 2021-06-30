@@ -1,4 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
+const widevine = require('electron-widevinecdm');
+widevine.load(app);
 const notifier = require('node-notifier');
 const url = require('url');
 const path = require('path');
@@ -50,7 +52,7 @@ checkInternet(function(isConnected) {
 		  console.log("Version is up to date!");
 		}
     	} else if (!error && response.statusCode == 404) {
-		  console.log("Unable to check latest version from main server!");
+		  console.log("\x1b[1m", "\x1b[31m", "Unable to check latest version from main server!\nIt may be because the server is down, moved, or does not exist.");
     	};
 });
     } else {
@@ -94,20 +96,28 @@ if (appYear == currentYear){
 }
 
 const createTray = () => {
-  tray = new Tray(path.join(icondir, '/tray-icon.png'))
-  const trayMenuTemplate = [
+  if (typeof config.madefor === 'undefined') {
+    var credittext = stringContributors
+    var trayMenuTemplate = [
+            { label: appname, enabled: false },
+	    { label: "Open source on github!", enabled: false},
+            { type: 'separator' },
+	    { label: 'About', role: 'about', click: function() { app.showAboutPanel();}},
+	    { label: 'Quit', role: 'quit', click: function() { app.quit();}}
+         ]
+  } else {
+    var trayMenuTemplate = [
             { label: appname, enabled: false },
 	    { label: "Made for: " + config.madefor, enabled: false},
             { type: 'separator' },
 	    { label: 'About', role: 'about', click: function() { app.showAboutPanel();}},
 	    { label: 'Quit', role: 'quit', click: function() { app.quit();}}
          ]
-  let trayMenu = Menu.buildFromTemplate(trayMenuTemplate)
-  tray.setContextMenu(trayMenu)
-	
-  if (config.madefor == "") {
     var credittext = stringContributors + '\n\nThis app was made for: ' + config.madefor
   }
+  tray = new Tray(path.join(icondir, '/tray-icon.png'))
+  let trayMenu = Menu.buildFromTemplate(trayMenuTemplate)
+  tray.setContextMenu(trayMenu)
   
   const aboutWindow = app.setAboutPanelOptions({
 	applicationName: appname,
@@ -127,9 +137,6 @@ function createWindow () {
     height: 900,
     //frame: false,
     icon: `${icondir}/app.${iconext}`,
-    webPreferences: {
-      nodeIntegration: false,
-    },
   });
   mainWindow.setMenuBarVisibility(false)
   if (notconnected == "1") {
@@ -148,21 +155,22 @@ function createWindow () {
   });
 }
 
-// "Red dot" icon feature
-mainWindow.webContents.once('did-finish-load', () => {
-	win.webContents.on('page-favicon-updated', () => {
-		tray.setImage(`${icondir}/ping.${iconext}`);
-	})
-
-	app.on('browser-window-focus', () => {
-		tray.setImage(`${icondir}/app.${iconext}`)
-	})
-})
-return mainWindow
-
 app.on('ready', () => {
   createWindow();
   createTray()
+  // "Red dot" icon feature
+  mainWindow.webContents.once('did-finish-load', () => {
+	const contents = mainWindow.webContents
+	console.log(contents)
+	mainWindow.webContents.on('page-favicon-updated', () => {
+		tray.setImage(`${icondir}/tray-ping.${iconext}`);
+	})
+
+	app.on('browser-window-focus', () => {
+		tray.setImage(`${icondir}/tray-ping.${iconext}`)
+	})
+  })
+  return mainWindow
 });
 
 app.on('window-all-closed', function () {
