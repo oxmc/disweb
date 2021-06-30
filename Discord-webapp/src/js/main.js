@@ -61,8 +61,6 @@ checkInternet(function(isConnected) {
     }
 });
 
-
-
 let mainWindow;
 let tray;
 
@@ -106,14 +104,18 @@ const createTray = () => {
          ]
   let trayMenu = Menu.buildFromTemplate(trayMenuTemplate)
   tray.setContextMenu(trayMenu)
+	
+  if (config.madefor == "") {
+    var credittext = stringContributors + '\n\nThis app was made for: ' + config.madefor
+  }
   
   const aboutWindow = app.setAboutPanelOptions({
 	applicationName: appname,
-	iconPath: icondir + '/tray-small.' + iconext + '',
+	iconPath: icondir + '/tray-small.' + iconext,
 	applicationVersion: 'Version: ' + appversion,
 	authors: appContributors,
 	website: webLink,
-	credits: 'credits: ' + stringContributors,
+	credits: 'Credits: ' + credittext,
 	copyright: 'Copyright © ' + copyYear + ' ' + appAuthor
   })
   return aboutWindow
@@ -145,6 +147,18 @@ function createWindow () {
     mainWindow = null;
   });
 }
+
+// "Red dot" icon feature
+mainWindow.webContents.once('did-finish-load', () => {
+	win.webContents.on('page-favicon-updated', () => {
+		tray.setImage(`${icondir}/ping.${iconext}`);
+	})
+
+	app.on('browser-window-focus', () => {
+		tray.setImage(`${icondir}/app.${iconext}`)
+	})
+})
+return mainWindow
 
 app.on('ready', () => {
   createWindow();
