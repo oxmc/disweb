@@ -1,12 +1,12 @@
 #!/bin/bash
 
-echo "Installing Discord..."
+echo "Installing DisWeb..."
 cd $HOME
 wget https://github.com/oxmc/disweb/releases/download/Discord-armv7l/Discord.zip
 sudo apt install -y unzip
 sudo unzip $HOME/Discord.zip -d $HOME/.local/share
 echo "[Desktop Entry]
-Name=Disweb
+Name=DisWeb
 Exec=$HOME/.local/share/Discord-webapp-linux-armv7l/Discord-webapp
 Icon=$HOME/.local/share/Discord-webapp-linux-armv7l/resources/app/src/icons/app.png
 Terminal=false
@@ -14,8 +14,8 @@ GenericName=Internet Messenger
 Type=Application
 StartupNotify=true
 Categories=Network;InstantMessaging;Utility;
-Encoding=UTF-8" > $HOME/.local/share/applications/Discord.desktop
-echo "Discord is now installed!"
+Encoding=UTF-8" > $HOME/.local/share/applications/DisWeb.desktop
+echo "DisWeb has been installed successfully!"
 cd $HOME
 rm -rf $HOME/Discord.zip
-echo "You can find Discord in Menu > Accessories > Discord for raspbery pi's."
+echo "You can find DisWeb in Menu > Accessories > DisWeb."
