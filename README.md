@@ -1,5 +1,7 @@
 # disweb
 
+A Discord desktop client for raspberry pi's.
+
 # Install:
 
 ```sh
