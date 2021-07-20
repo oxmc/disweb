@@ -5,7 +5,8 @@
   "main": "src/js/Main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oxmc/disweb.git"
+    "url": "https://github.com/oxmc/disweb.git",
+    "etc": "electron-widevinecdm: ^7.0.0,"
   },
   "scripts": {
     "start": "electron .",
@@ -19,11 +20,13 @@
   },
   "dependencies": {
     "decompress": "^4.2.1",
+    "dns": "^0.2.2",
     "electron-packager": "^15.2.0",
-    "electron-widevinecdm": "^7.0.0",
+    "internet-available": "^1.0.0",
     "node-notifier": "^9.0.1",
     "path": "^0.12.7",
     "request": "^2.88.2",
-    "reuest": "^0.0.1-security"
+    "reuest": "^0.0.1-security",
+    "url": "^0.11.0"
   }
 }

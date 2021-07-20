@@ -1,9 +1,10 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
-const widevine = require('electron-widevinecdm');
-widevine.load(app);
+/*const widevine = require('electron-widevinecdm');
+widevine.load(app);*/
 const notifier = require('node-notifier');
 const path = require('path');
 const decompress = require("decompress");
+var request = require('request');
 
 //Functions
 function checkInternet(cb) {
@@ -16,7 +17,79 @@ function checkInternet(cb) {
     })
 }
 
-function notification(mode, arg1) {
+let SplashWindow;
+let UpdatingWindow;
+let mainWindow;
+let tray;
+
+function createWindow () {
+  //Splash window
+  SplashWindow = new BrowserWindow({
+    width: 350,
+    height: 350,
+    frame: false,
+    transparent: false,
+    center: true,
+    icon: `${icondir}/app.${iconext}`,
+    backgroundColor: '#23272A',
+  });
+  SplashWindow.loadFile(appdir + '/view/splash.html');
+  SplashWindow.on('closed', function () {
+    SplashWindow = null;
+  });
+  SplashWindow.hide()
+  //Updater window
+  UpdatingWindow = new BrowserWindow({
+    width: 350,
+    height: 350,
+    frame: false,
+    transparent: false,
+    center: true,
+    icon: `${icondir}/app.${iconext}`,
+    backgroundColor: '#23272A',
+  });
+  UpdatingWindow.loadFile(appdir + '/view/update.html');
+  UpdatingWindow.on('closed', function () {
+    UpdatingWindow = null;
+  });
+  UpdatingWindow.hide()
+  //Main Window
+  mainWindow = new BrowserWindow({
+    width: 1040,
+    height: 900,
+    icon: `${icondir}/app.${iconext}`,
+  });
+  mainWindow.setMenuBarVisibility(false)
+  if (config.view.mode == "file") {
+    mainWindow.loadFile(appdir + '/view/index.html');
+  } else if (config.view.mode == "url") {
+    mainWindow.loadURL(config.view.url)
+  } else {
+    console.log("Error: Unknown mode given at config.view.mode");
+  }
+  mainWindow.on('closed', function () {
+    mainWindow = null;
+  });
+  mainWindow.hide()
+}
+
+function Ready() {
+  setTimeout(function () {
+    SplashWindow.close();
+    mainWindow.show();
+    // "Red dot" tray icon
+    const contents = mainWindow.webContents
+    mainWindow.webContents.on('page-favicon-updated', () => {
+      tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
+      console.log();
+    })
+    app.on('browser-window-focus', () => {
+      tray.setImage(`${icondir}/tray/tray-ping.${iconext}`)
+    })
+  }, 5000)
+}
+
+async function notification(mode, arg1) {
   if (mode == "1") {
     notifier.notify({
         title: 'Update availible.',
@@ -24,34 +97,32 @@ function notification(mode, arg1) {
         icon: icondir + '/download.png',
         sound: true,
         wait: true
-      },
-      function (err, response1) {
-        console.log("Downloading latest version...");
-	      console.log("OS type is: " + os.platform());
-	      console.log("Downloading '" + serverUrl + os.platform() + ".zip'");
-        (async () => {
-          try {
-            request(serverUrl + os.platform() + '.zip').pipe(fs.createWriteStream('app.zip'));
-            try {
-              const files = await decompress("app.zip", "dist");
-              console.log(files);
-              console.log("\x1b[1m", "\x1b[32m", "Successfully download new update!", "\x1b[0m");
-              notification(2)
-            } catch (error) {
-              console.log(error);
-              notification(4)
-            }
-          } catch(e) {
-            console.log("\x1b[1m", "\x1b[31m", "ERROR: Unable to download '" + serverUrl + os.platform() + ".zip'", "\x1b[0m");
-	          notification(4, serverUrl + os.platform() + ".zip")
-          }
-        })();
+    });
+    //SplashWindow.close();
+    mainWindow.hide();
+    UpdatingWindow.show()
+    console.log("Downloading latest version...");
+	  console.log("OS type is: " + os.platform());
+	  console.log("Downloading '" + serverUrl + os.platform() + ".zip'");
+    try {
+      request(serverUrl + os.platform() + '.zip').pipe(fs.createWriteStream('app.zip'));
+      try {
+        const files = await decompress("app.zip", "dist");
+        console.log(files);
+        console.log("\x1b[1m", "\x1b[32m", "Successfully download new update!", "\x1b[0m");
+        notification(2)
+      } catch (error) {
+        console.log(error);
+        notification(5)
       }
-    );
+    } catch(e) {
+      console.log("\x1b[1m", "\x1b[31m", "ERROR: Unable to download '" + serverUrl + os.platform() + ".zip'", "\x1b[0m");
+	     notification(4, serverUrl + os.platform() + ".zip")
+    }
   } else if (mode == "2") {
     notifier.notify({
         title: 'Update downloaded.',
-        message: 'An update has been downloaded, click here to update.',
+        message: 'An update has been downloaded, Restarting app...',
         icon: icondir + '/tray-small.png',
         sound: true,
         wait: true
@@ -66,7 +137,7 @@ function notification(mode, arg1) {
   } else if (mode == "3") {
     notifier.notify({
         title: 'Not connected.',
-        message: 'You are not connected to the internet, I will not be able to check for updates.',
+        message: 'You are not connected to the internet, you can not use '+appname+' without the internet.',
         icon: icondir + '/warning.png',
         sound: true,
         wait: true
@@ -77,6 +148,9 @@ function notification(mode, arg1) {
         }
       }
     );
+    SplashWindow.hide();
+    mainWindow.loadFile(appdir + '/view/nowifi.html');
+    mainWindow.show();
   } else if (mode == "4") {
     notifier.notify({
         title: 'Error downloading.',
@@ -96,6 +170,25 @@ function notification(mode, arg1) {
         }
       }
     );
+  } else if (mode == "5") {
+    notifier.notify({
+        title: 'Error extracting files.',
+        message: 'There was an error extracting some files.',
+        icon: icondir + '/symbl/warning.png',
+        sound: true,
+        wait: true
+      },
+      function (err, response5) {
+        if (response5 == "activate") {
+          console.log("User clicked on unable to extract notification.");
+        } else {
+	        notifier.on('timeout', function (notifierObject, options) {
+	          // Triggers if notification closes
+	          console.log("User did not click on unable to extract notification.");
+	        });
+        }
+      }
+    );
   }
 }
 
@@ -109,46 +202,47 @@ var os = require('os');
 var packageJson = require(app.getAppPath() + '/package.json') // Read package.json
 var repoLink = packageJson.repository.url
 var webLink = repoLink.substring(repoLink.indexOf("+")+1)
+var serverVerUrl = config.serververurl
 var serverUrl = config.serverurl
 
+//Show info about app if ran from terminal
 console.log('appname: ' + appname);
 console.log('appversion: ' + appversion);
 console.log('appdir: ' + appdir);
 console.log('configdir: ' + appdir + "/configs");
 console.log('icondir: ' + icondir);
 
+//Main
 //Check if user is connected to the internet.
 checkInternet(function(isConnected) {
     if (isConnected) {
-        //Get latest version from GitHub.
-	      var request = require('request');
-	      request(serverUrl + "build.json", function (error, response, body) {
-    	    if (!error && response.statusCode == 200) {
-            var onlineversion = JSON.parse(body);
-		        console.log("Online version: '" + onlineversion.Ver + "'");
-		        console.log("Local version: '" + appversion + "'");
-		        //If Online version is greater than local version, show update dialog.
-		        if ( appversion != onlineversion.Ver ) {
-              console.log("\x1b[1m", "\x1b[31m", "Version is not up to date!", "\x1b[0m");
-		          notification(1);
-		        } else {
-		          console.log("\x1b[1m", "\x1b[32m", "Version is up to date!", "\x1b[0m");
-		        }
-          } else if (!error && response.statusCode == 404) {
-		        console.log("\x1b[1m", "\x1b[31m", "Unable to check latest version from main server!\nIt may be because the server is down, moved, or does not exist.", "\x1b[0m");
-          };
-        });
+      //Get latest version from GitHub.
+      var request = require('request');
+      request(serverVerUrl, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          var verf = JSON.parse(body);
+          const verstring = JSON.stringify(verf);
+          const ver = verf.version;
+          const onlineversion = ver.replace(/"([^"]+)":/g, '$1:');
+          console.log("Online version: '" + onlineversion + "'");
+          console.log("Local version: '" + appversion + "'");
+          //If Online version is greater than local version, show update dialog.
+          if ( onlineversion >= appversion ) {
+            console.log("\x1b[1m", "\x1b[31m", "Version is not up to date!", "\x1b[0m");
+            notification(1);
+          } else {
+            console.log("\x1b[1m", "\x1b[32m", "Version is up to date!", "\x1b[0m");
+          }
+        } else if (!error && response.statusCode == 404) {
+          console.log("\x1b[1m", "\x1b[31m", "Unable to check latest version from main server!\nIt may be because the server is down, moved, or does not exist.", "\x1b[0m");
+        };
+      });
     } else {
-	    //User not connected
+      //User not connected
       console.log("\x1b[1m", "\x1b[31m", "ERROR: User is not connected to internet, showing NotConnectedNotification", "\x1b[0m");
-	    notification(3);
+      notification(3);
     }
 });
-
-//Main
-let SplashWindow;
-let mainWindow;
-let tray;
 
 var contrib = require(appdir + '/contributors.json') // Read contributors.json
 
@@ -209,58 +303,16 @@ const createTray = () => {
   return aboutWindow
 }
 
-function createWindow () {
-  //Splash window
-  SplashWindow = new BrowserWindow({
-    width: 350,
-    height: 350,
-    frame: false,
-    transparent: false,
-    center: true,
-    icon: `${icondir}/app.${iconext}`,
-    backgroundColor: '#23272A',
-  });
-  SplashWindow.loadFile(appdir + '/view/splash.html');
-  SplashWindow.on('closed', function () {
-    SplashWindow = null;
-  });
-  //Main Window
-  mainWindow = new BrowserWindow({
-    width: 1040,
-    height: 900,
-    icon: `${icondir}/app.${iconext}`,
-  });
-  mainWindow.setMenuBarVisibility(false)
-  if (config.view.mode == "file") {
-    mainWindow.loadFile(appdir + '/view/index.html');
-  } else if (config.view.mode == "url") {
-    mainWindow.loadURL(config.view.url)
-  } else {
-    console.log("\x1b[1m", "\x1b[31m", "Error: Unknown mode given at config.view.mode", "\x1b[0m");
-  }
-  mainWindow.on('closed', function () {
-    mainWindow = null;
-  });
-  mainWindow.hide()
-}
-
 app.on('ready', () => {
   createWindow();
   createTray()
-  // "Red dot" icon feature
+  UpdatingWindow.hide()
+  SplashWindow.hide();
+  mainWindow.hide();
+  // Close loading screen after, loading...
   mainWindow.webContents.once('did-finish-load', () => {
-	  const contents = mainWindow.webContents
-    mainWindow.show()
-    SplashWindow.close()
-	  mainWindow.webContents.on('page-favicon-updated', () => {
-		  tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
-	  })
-	  app.on('browser-window-focus', () => {
-		  tray.setImage(`${icondir}/tray/tray-ping.${iconext}`)
-	  })
+    Ready();
   })
-  return SplashWindow
-  return mainWindow
 });
 
 app.on('window-all-closed', function () {

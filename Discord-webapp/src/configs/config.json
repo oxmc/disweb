@@ -3,5 +3,7 @@
     "mode": "url",
     "url": "https://discord.com/app/"
   },
-  "madefor": "Pi-Ware"
+  "madefor": "Pi-Ware",
+  "serververurl": "https://raw.githubusercontent.com/oxmc/disweb/master/Discord-webapp/package.json",
+  "serverurl": "https://github.com/oxmc/disweb/releases/download/Discord-armv7l/"
 }
