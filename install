@@ -4,7 +4,7 @@ echo "Installing DisWeb..."
 mkdir -p $HOME/.local/share
 mkdir -p $HOME/.local/share/applications
 cd $HOME
-wget https://oxmc.github.io/diswebreleaseserver/latest/full/Discord-armv7l/DisWeb.zip
+wget https://github.com/oxmc/diswebreleaseserver/releases/download/Base/DisWeb-base.zip
 sudo apt install -y unzip libnotify-bin
 sudo unzip $HOME/DisWeb.zip -d $HOME/.local/share
 echo "[Desktop Entry]
