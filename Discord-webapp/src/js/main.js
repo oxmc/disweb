@@ -1,10 +1,11 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
-/*const widevine = require('electron-widevinecdm');
-widevine.load(app);*/
+const widevine = require('electron-widevinecdm');
+widevine.load(app);
 const notifier = require('node-notifier');
 const path = require('path');
 const decompress = require("decompress");
 var request = require('request');
+var os = require('os');
 
 //Functions
 function checkInternet(cb) {
@@ -21,6 +22,7 @@ let SplashWindow;
 let UpdatingWindow;
 let mainWindow;
 let tray;
+const update =false;
 
 function createWindow () {
   //Splash window
@@ -41,12 +43,16 @@ function createWindow () {
   //Updater window
   UpdatingWindow = new BrowserWindow({
     width: 350,
-    height: 350,
+    height: 370,
     frame: false,
     transparent: false,
     center: true,
     icon: `${icondir}/app.${iconext}`,
     backgroundColor: '#23272A',
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
   });
   UpdatingWindow.loadFile(appdir + '/view/update.html');
   UpdatingWindow.on('closed', function () {
@@ -74,19 +80,82 @@ function createWindow () {
 }
 
 function Ready() {
-  setTimeout(function () {
+  if (update == true) {
+    UpdatingWindow.show();
+    SplashWindow.close();
+    mainWindow.close();
+  } else {
+    UpdatingWindow.close();
     SplashWindow.close();
     mainWindow.show();
-    // "Red dot" tray icon
+    // "Red dot" and "Ping" tray icon
     const contents = mainWindow.webContents
-    mainWindow.webContents.on('page-favicon-updated', () => {
-      tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
-      console.log();
+    mainWindow.webContents.on('page-favicon-updated', (event, favicons) => {
+      //console.log(event);
+      //console.log(favicons);
+      const fav1 = JSON.stringify(favicons);
+      const fav2 = fav1.replace(/\"/g, "");
+      const fav3 = fav2.replace(/\'/g, "");
+      const fav4 = fav3.replace(/\[/g, "");
+      const fav = fav4.replace(/\]/g, "");
+      //console.log(fav);
+      if (fav == pings.Badges.None) {
+        tray.setImage(`${icondir}/tray/tray-small.${iconext}`);
+        mainWindow.setIcon(`${icondir}/tray/tray-small.${iconext}`);
+        //console.log("Ping: None")
+      } else if (fav == pings.Badges.Active) {
+        tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
+        mainWindow.setIcon(`${icondir}/tray/tray-ping.${iconext}`);
+        //console.log("Ping: Unread")
+      } else if (fav == pings.Badges.one) {
+        tray.setImage(`${icondir}/ping/badge-1.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-1.${iconext}`);
+        //console.log("Ping: 1")
+      } else if (fav == pings.Badges.two) {
+        tray.setImage(`${icondir}/ping/badge-2.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-2.${iconext}`);
+        //console.log("Ping: 2")
+      } else if (fav == pings.Badges.three) {
+        tray.setImage(`${icondir}/ping/badge-3.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-3.${iconext}`);
+        //console.log("Ping: 3")
+      } else if (fav == pings.Badges.four) {
+        tray.setImage(`${icondir}/ping/badge-4.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-4.${iconext}`);
+        //console.log("Ping: 4")
+      } else if (fav == pings.Badges.five) {
+        tray.setImage(`${icondir}/ping/badge-5.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-5.${iconext}`);
+        //console.log("Ping: 5")
+      } else if (fav == pings.Badges.six) {
+        tray.setImage(`${icondir}/ping/badge-6.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-6.${iconext}`);
+        //console.log("Ping: 6")
+      } else if (fav == pings.Badges.seven) {
+        tray.setImage(`${icondir}/ping/badge-7.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-7.${iconext}`);
+        //console.log("Ping: 7")
+      } else if (fav == pings.Badges.eight) {
+        tray.setImage(`${icondir}/ping/badge-8.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-8.${iconext}`);
+        //console.log("Ping: 8")
+      } else if (fav == pings.Badges.nine) {
+        tray.setImage(`${icondir}/ping/badge-9.${iconext}`);
+        mainWindow.setIcon(`${icondir}/ping/badge-9.${iconext}`);
+        //console.log("Ping: 9")
+      } else if (fav == pings.Badges.ten) {
+        tray.setImage(`${icondir}/ping/badge-10.${iconext}`)
+        mainWindow.setIcon(`${icondir}/ping/badge-10.${iconext}`);
+        //console.log("Ping: 10");
+      } else {
+        tray.setImage(`${icondir}/symbl/warning.${iconext}`);
+        //console.log("Ping: Unkown");
+      }
     })
     app.on('browser-window-focus', () => {
       tray.setImage(`${icondir}/tray/tray-ping.${iconext}`)
     })
-  }, 5000)
+  }
 }
 
 async function notification(mode, arg1) {
@@ -94,36 +163,15 @@ async function notification(mode, arg1) {
     notifier.notify({
         title: 'Update availible.',
         message: 'An update is availible, Downloading now....',
-        icon: icondir + '/download.png',
+        icon: icondir + '/symbl/download.png',
         sound: true,
         wait: true
     });
-    //SplashWindow.close();
-    mainWindow.hide();
-    UpdatingWindow.show()
-    console.log("Downloading latest version...");
-	  console.log("OS type is: " + os.platform());
-	  console.log("Downloading '" + serverUrl + os.platform() + ".zip'");
-    try {
-      request(serverUrl + os.platform() + '.zip').pipe(fs.createWriteStream('app.zip'));
-      try {
-        const files = await decompress("app.zip", "dist");
-        console.log(files);
-        console.log("\x1b[1m", "\x1b[32m", "Successfully download new update!", "\x1b[0m");
-        notification(2)
-      } catch (error) {
-        console.log(error);
-        notification(5)
-      }
-    } catch(e) {
-      console.log("\x1b[1m", "\x1b[31m", "ERROR: Unable to download '" + serverUrl + os.platform() + ".zip'", "\x1b[0m");
-	     notification(4, serverUrl + os.platform() + ".zip")
-    }
   } else if (mode == "2") {
     notifier.notify({
         title: 'Update downloaded.',
         message: 'An update has been downloaded, Restarting app...',
-        icon: icondir + '/tray-small.png',
+        icon: icondir + '/tray/tray-small.png',
         sound: true,
         wait: true
       },
@@ -138,7 +186,7 @@ async function notification(mode, arg1) {
     notifier.notify({
         title: 'Not connected.',
         message: 'You are not connected to the internet, you can not use '+appname+' without the internet.',
-        icon: icondir + '/warning.png',
+        icon: icondir + '/symbl/warning.png',
         sound: true,
         wait: true
       },
@@ -155,7 +203,7 @@ async function notification(mode, arg1) {
     notifier.notify({
         title: 'Error downloading.',
         message: 'Unable to download latest update file: ' + arg1 + '.',
-        icon: icondir + '/warning.png',
+        icon: icondir + '/sybl/warning.png',
         sound: true,
         wait: true
       },
@@ -198,16 +246,26 @@ var icondir = path.join(appdir, '/icons');
 var appname = app.getName();
 var appversion = app.getVersion();
 const config = require(appdir + '/configs/config.json'); // Read the config
-var os = require('os');
+const pings = require(appdir + '/configs/pings.json'); // Read the pings data
 var packageJson = require(app.getAppPath() + '/package.json') // Read package.json
 var repoLink = packageJson.repository.url
 var webLink = repoLink.substring(repoLink.indexOf("+")+1)
 var serverVerUrl = config.serververurl
 var serverUrl = config.serverurl
 
+ipcMain.on('synchronous-message', (event, arg) => {
+  if (arg.notif == "2") {
+    notification(2);
+  } else if (arg.notif == "4") {
+    notification(4, arg.url);
+  } else if (arg.notif == "5") {
+    notification(5);
+  }
+})
+
 //Show info about app if ran from terminal
 console.log('appname: ' + appname);
-console.log('appversion: ' + appversion);
+//console.log('appversion: ' + appversion);
 console.log('appdir: ' + appdir);
 console.log('configdir: ' + appdir + "/configs");
 console.log('icondir: ' + icondir);
@@ -217,7 +275,7 @@ console.log('icondir: ' + icondir);
 checkInternet(function(isConnected) {
     if (isConnected) {
       //Get latest version from GitHub.
-      var request = require('request');
+      console.log("Initilize Updater:");
       request(serverVerUrl, function (error, response, body) {
         if (!error && response.statusCode == 200) {
           var verf = JSON.parse(body);
@@ -227,11 +285,17 @@ checkInternet(function(isConnected) {
           console.log("Online version: '" + onlineversion + "'");
           console.log("Local version: '" + appversion + "'");
           //If Online version is greater than local version, show update dialog.
-          if ( onlineversion >= appversion ) {
+          if (onlineversion > appversion) {
             console.log("\x1b[1m", "\x1b[31m", "Version is not up to date!", "\x1b[0m");
+            update = true;
             notification(1);
+            mainWindow.close();
+            SplashWindow.close();
+            UpdatingWindow.show()
+            return update
           } else {
             console.log("\x1b[1m", "\x1b[32m", "Version is up to date!", "\x1b[0m");
+            SplashWindow.show();
           }
         } else if (!error && response.statusCode == 404) {
           console.log("\x1b[1m", "\x1b[31m", "Unable to check latest version from main server!\nIt may be because the server is down, moved, or does not exist.", "\x1b[0m");
@@ -307,7 +371,6 @@ app.on('ready', () => {
   createWindow();
   createTray()
   UpdatingWindow.hide()
-  SplashWindow.hide();
   mainWindow.hide();
   // Close loading screen after, loading...
   mainWindow.webContents.once('did-finish-load', () => {

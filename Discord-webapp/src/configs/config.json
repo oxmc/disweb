@@ -5,5 +5,5 @@
   },
   "madefor": "Pi-Ware",
   "serververurl": "https://raw.githubusercontent.com/oxmc/disweb/master/Discord-webapp/package.json",
-  "serverurl": "https://github.com/oxmc/disweb/releases/download/Discord-armv7l/"
+  "serverurl": "https://oxmc.github.io/diswebreleaseserver/latest/Discord-armv7l/src.zip"
 }
