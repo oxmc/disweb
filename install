@@ -4,6 +4,9 @@ echo "Installing DisWeb..."
 mkdir -p $HOME/.local/share
 mkdir -p $HOME/.local/share/applications
 cd $HOME
+if [ -f "DisWeb-base.zip" ]; {
+  rm -rf DisWeb-base.zip
+};
 wget https://github.com/oxmc/diswebreleaseserver/releases/download/Base/DisWeb-base.zip
 sudo apt install -y unzip libnotify-bin at-spi2-core mate-notification-daemon mate-notification-daemon-common
 sudo unzip $HOME/DisWeb-base.zip -d $HOME/.local/share
