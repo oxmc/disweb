@@ -2,26 +2,14 @@
   "name": "Discord-webapp",
   "version": "1.2.0",
   "description": "A Discord Desktop app for pi-ware, built with electron-builder.",
-  "main": "src/js/main.js",
+  "main": "src/js/Main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/oxmc/disweb.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "build-mac": "electron-builder build --mac --publish never",
-    "build-win": "electron-builder build --win --publish never",
-    "deploy": "electron-builder build --mac --win --publish always",
-    "pack": "electron-packager . Discord-webapp --all --icon './src/icons/app.png'",
-    "linux": "electron-packager . Discord-webapp --linux armv7l --icon './src/icons/app.png'"
-  },
-  "build": {
-    "appId": "com.oxmc.app",
-    "files": [
-      "**/*",
-      "icons/app.*"
-    ]
+    "pack-linuxarmv7l": "electron-packager . Tasky --platform=linux --arch=armv7l --icon './src/icons/app.png'"
   },
   "author": "oxmc",
   "license": "ISC",
@@ -30,9 +18,10 @@
     "electron-builder": "^20.44.4"
   },
   "dependencies": {
+    "decompress": "^4.2.1",
     "electron-packager": "^15.2.0",
-    "electron-widevinecdm": "^7.0.0",
     "node-notifier": "^9.0.1",
+    "path": "^0.12.7",
     "request": "^2.88.2",
     "reuest": "^0.0.1-security"
   }

@@ -1,11 +1,9 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
-const widevine = require('electron-widevinecdm');
-widevine.load(app);
 const notifier = require('node-notifier');
 const path = require('path');
 const decompress = require("decompress");
 
-//Functions
+//Check if user is online
 function checkInternet(cb) {
     require('dns').lookup('google.com',function(err) {
         if (err && err.code == "ENOTFOUND") {
@@ -16,58 +14,53 @@ function checkInternet(cb) {
     })
 }
 
+//Functions
 function notification(mode, arg1) {
   if (mode == "1") {
     notifier.notify({
         title: 'Update availible.',
-        message: 'An update is availible, Downloading now....',
-        icon: icondir + '/download.png',
+        message: 'An update is availible, Downloading it now...',
+        icon: icondir + '/symbl/download.png',
         sound: true,
         wait: true
       },
-      function (err, response1) {
-        console.log("Downloading latest version...");
-	      console.log("OS type is: " + os.platform());
-	      console.log("Downloading '" + serverUrl + os.platform() + ".zip'");
-        (async () => {
+      console.log("Downloading latest version...");
+      console.log("OS type is: " + os.platform());
+      console.log("Downloading '" + serverUrl + os.platform() + ".zip'");
+      (async () => {
+        try {
+          request(serverUrl + os.platform() + '.zip').pipe(fs.createWriteStream('app.zip'));
           try {
-            request(serverUrl + os.platform() + '.zip').pipe(fs.createWriteStream('app.zip'));
-            try {
-              const files = await decompress("app.zip", "dist");
-              console.log(files);
-              console.log("\x1b[1m", "\x1b[32m", "Successfully download new update!", "\x1b[0m");
-              notification(2)
-            } catch (error) {
-              console.log(error);
-              notification(4)
-            }
-          } catch(e) {
-            console.log("\x1b[1m", "\x1b[31m", "ERROR: Unable to download '" + serverUrl + os.platform() + ".zip'", "\x1b[0m");
-	          notification(4, serverUrl + os.platform() + ".zip")
+            const files = await decompress("app.zip", "dist");
+            console.log(files);
+            console.log("\x1b[1m", "\x1b[32m", "Successfully download new update!", "\x1b[0m");
+            notification(2)
+          } catch (error) {
+            console.log(error);
+            notification(4)
           }
-        })();
-      }
+        } catch(e) {
+          console.log("\x1b[1m", "\x1b[31m", "ERROR: Unable to download '" + serverUrl + os.platform() + ".zip'", "\x1b[0m");
+          notification(4, serverUrl + os.platform() + ".zip")
+        }
+      })();
     );
   } else if (mode == "2") {
     notifier.notify({
         title: 'Update downloaded.',
-        message: 'An update has been downloaded, click here to update.',
-        icon: icondir + '/tray-small.png',
+        message: 'An update has been downloaded, restarting app...',
+        icon: icondir + '/smbl/checkmark.png',
         sound: true,
         wait: true
       },
-      function (err, response2) {
-        if (response2 == "activate") {
-          console.log("An update has been downloaded.");
-          app.quit();
-        }
-      }
+      app.quit();
+      app.relaunch();
     );
   } else if (mode == "3") {
     notifier.notify({
         title: 'Not connected.',
         message: 'You are not connected to the internet, I will not be able to check for updates.',
-        icon: icondir + '/warning.png',
+        icon: icondir + '/symbl/warning.png',
         sound: true,
         wait: true
       },
@@ -81,7 +74,7 @@ function notification(mode, arg1) {
     notifier.notify({
         title: 'Error downloading.',
         message: 'Unable to download latest update file: ' + arg1 + '.',
-        icon: icondir + '/warning.png',
+        icon: icondir + '/symbl/warning.png',
         sound: true,
         wait: true
       },
@@ -104,7 +97,8 @@ var appdir = path.join(app.getAppPath(), '/src');
 var icondir = path.join(appdir, '/icons');
 var appname = app.getName();
 var appversion = app.getVersion();
-const config = require(appdir + '/configs/config.json'); // Read the config
+var configdir = path.join(appdir, '/configs');
+const config = require(configdir + '/config.json'); // Read the config
 var os = require('os');
 var packageJson = require(app.getAppPath() + '/package.json') // Read package.json
 var repoLink = packageJson.repository.url
@@ -114,7 +108,7 @@ var serverUrl = config.serverurl
 console.log('appname: ' + appname);
 console.log('appversion: ' + appversion);
 console.log('appdir: ' + appdir);
-console.log('configdir: ' + appdir + "/configs");
+console.log('configdir: ' + configdir);
 console.log('icondir: ' + icondir);
 
 //Check if user is connected to the internet.
@@ -145,8 +139,6 @@ checkInternet(function(isConnected) {
     }
 });
 
-//Main
-let SplashWindow;
 let mainWindow;
 let tray;
 
@@ -210,24 +202,11 @@ const createTray = () => {
 }
 
 function createWindow () {
-  //Splash window
-  SplashWindow = new BrowserWindow({
-    width: 350,
-    height: 350,
-    frame: false,
-    transparent: false,
-    center: true,
-    icon: `${icondir}/app.${iconext}`,
-    backgroundColor: '#23272A',
-  });
-  SplashWindow.loadFile(appdir + '/view/splash.html');
-  SplashWindow.on('closed', function () {
-    SplashWindow = null;
-  });
-  //Main Window
   mainWindow = new BrowserWindow({
-    width: 1040,
-    height: 900,
+    width: 500,
+    height: 410,
+    frame: false,
+    transparent: true,
     icon: `${icondir}/app.${iconext}`,
   });
   mainWindow.setMenuBarVisibility(false)
@@ -241,7 +220,6 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
-  mainWindow.hide()
 }
 
 app.on('ready', () => {
@@ -250,8 +228,7 @@ app.on('ready', () => {
   // "Red dot" icon feature
   mainWindow.webContents.once('did-finish-load', () => {
 	  const contents = mainWindow.webContents
-    mainWindow.show()
-    SplashWindow.close()
+	  console.log(contents)
 	  mainWindow.webContents.on('page-favicon-updated', () => {
 		  tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
 	  })
