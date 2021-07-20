@@ -6,7 +6,7 @@ mkdir -p $HOME/.local/share/applications
 cd $HOME
 wget https://github.com/oxmc/diswebreleaseserver/releases/download/Base/DisWeb-base.zip
 sudo apt install -y unzip libnotify-bin
-sudo unzip $HOME/DisWeb.zip -d $HOME/.local/share
+sudo unzip $HOME/DisWeb-base.zip -d $HOME/.local/share
 echo "[Desktop Entry]
 Name=DisWeb
 Exec=$HOME/.local/share/DisWeb-linux-armv7l/DisWeb
