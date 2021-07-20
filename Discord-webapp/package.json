@@ -1,6 +1,6 @@
 {
   "name": "Discord-webapp",
-  "version": "1.2.0",
+  "version": "1.2.5",
   "description": "A Discord Desktop app for pi-ware, built with electron-builder.",
   "main": "src/js/Main.js",
   "repository": {
@@ -20,6 +20,7 @@
   "dependencies": {
     "decompress": "^4.2.1",
     "electron-packager": "^15.2.0",
+    "electron-widevinecdm": "^7.0.0",
     "node-notifier": "^9.0.1",
     "path": "^0.12.7",
     "request": "^2.88.2",
