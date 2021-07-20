@@ -102,54 +102,54 @@ function Ready() {
       if (fav == pings.Badges.None) {
         tray.setImage(`${icondir}/tray/tray-small.${iconext}`);
         mainWindow.setIcon(`${icondir}/tray/tray-small.${iconext}`);
-        console.log("Ping: None")
-      } else if (fav == pings.Badges.Unread) {
+        //console.log("Ping: None")
+      } else if (fav == pings.Badges.Active) {
         tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
         mainWindow.setIcon(`${icondir}/tray/tray-ping.${iconext}`);
-        console.log("Ping: Unread")
-      } else if (fav == pings.Badges.One) {
+        //console.log("Ping: Unread")
+      } else if (fav == pings.Badges.one) {
         tray.setImage(`${icondir}/ping/badge-1.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-1.${iconext}`);
-        console.log("Ping: 1")
-      } else if (fav == pings.Badges.Two) {
+        //console.log("Ping: 1")
+      } else if (fav == pings.Badges.two) {
         tray.setImage(`${icondir}/ping/badge-2.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-2.${iconext}`);
-        console.log("Ping: 2")
-      } else if (fav == pings.Badges.Three) {
+        //console.log("Ping: 2")
+      } else if (fav == pings.Badges.three) {
         tray.setImage(`${icondir}/ping/badge-3.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-3.${iconext}`);
-        console.log("Ping: 3")
-      } else if (fav == pings.Badges.Four) {
+        //console.log("Ping: 3")
+      } else if (fav == pings.Badges.four) {
         tray.setImage(`${icondir}/ping/badge-4.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-4.${iconext}`);
-        console.log("Ping: 4")
-      } else if (fav == pings.Badges.linux.Five) {
+        //console.log("Ping: 4")
+      } else if (fav == pings.Badges.five) {
         tray.setImage(`${icondir}/ping/badge-5.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-5.${iconext}`);
-        console.log("Ping: 5")
-      } else if (fav == pings.Badges.linux.Six) {
+        //console.log("Ping: 5")
+      } else if (fav == pings.Badges.six) {
         tray.setImage(`${icondir}/ping/badge-6.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-6.${iconext}`);
-        console.log("Ping: 6")
-      } else if (fav == pings.Badges.Seven) {
+        //console.log("Ping: 6")
+      } else if (fav == pings.Badges.seven) {
         tray.setImage(`${icondir}/ping/badge-7.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-7.${iconext}`);
-        console.log("Ping: 7")
-      } else if (fav == pings.Badges.Eight) {
+        //console.log("Ping: 7")
+      } else if (fav == pings.Badges.eight) {
         tray.setImage(`${icondir}/ping/badge-8.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-8.${iconext}`);
-        console.log("Ping: 8")
-      } else if (fav == pings.Badges.Nine) {
+        //console.log("Ping: 8")
+      } else if (fav == pings.Badges.nine) {
         tray.setImage(`${icondir}/ping/badge-9.${iconext}`);
         mainWindow.setIcon(`${icondir}/ping/badge-9.${iconext}`);
-        console.log("Ping: 9")
-      } else if (fav == pings.Badges.Ten) {
+        //console.log("Ping: 9")
+      } else if (fav == pings.Badges.ten) {
         tray.setImage(`${icondir}/ping/badge-10.${iconext}`)
         mainWindow.setIcon(`${icondir}/ping/badge-10.${iconext}`);
-        console.log("Ping: 10");
+        //console.log("Ping: 10");
       } else {
         tray.setImage(`${icondir}/symbl/warning.${iconext}`);
-        console.log("Ping: Unkown");
+        //console.log("Ping: Unkown");
       }
     })
     app.on('browser-window-focus', () => {
