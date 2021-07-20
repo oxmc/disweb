@@ -1,6 +1,12 @@
 # disweb
 
-A Discord desktop client for raspberry pi's, that show when you have pings.
+A Discord desktop client for raspberry pi's.
+
+# Features:
+Shows when you have pings,
+Auto-Updater,
+Small file size,
+And fully open-source!
 
 # Install:
 
