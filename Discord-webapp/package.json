@@ -1,6 +1,6 @@
 {
   "name": "DisWeb",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "description": "A Discord Desktop app for pi-ware, built with electron-builder.",
   "main": "src/js/main.js",
   "repository": {
