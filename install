@@ -1,14 +1,16 @@
 #!/bin/bash
 
 echo "Installing DisWeb..."
+mkdir -p $HOME/.local/share
+mkdir -p $HOME/.local/share/applications
 cd $HOME
-wget https://github.com/oxmc/disweb/releases/download/Discord-armv7l/Discord.zip
+wget https://oxmc.github.io/diswebreleaseserver/latest/full/Discord-armv7l/DisWeb.zip
 sudo apt install -y unzip libnotify-bin
-sudo unzip $HOME/Discord.zip -d $HOME/.local/share
+sudo unzip $HOME/DisWeb.zip -d $HOME/.local/share
 echo "[Desktop Entry]
 Name=DisWeb
-Exec=$HOME/.local/share/Discord-webapp-linux-armv7l/Discord-webapp
-Icon=$HOME/.local/share/Discord-webapp-linux-armv7l/resources/app/src/icons/app.png
+Exec=$HOME/.local/share/DisWeb-linux-armv7l/DisWeb
+Icon=$HOME/.local/share/DisWeb-linux-armv7l/resources/app/src/icons/app.png
 Terminal=false
 GenericName=Internet Messenger
 Type=Application
@@ -17,5 +19,5 @@ Categories=Network;InstantMessaging;Utility;
 Encoding=UTF-8" > $HOME/.local/share/applications/DisWeb.desktop
 echo "DisWeb has been installed successfully!"
 cd $HOME
-rm -rf $HOME/Discord.zip
+rm -rf $HOME/DisWeb.zip
 echo "You can find DisWeb in Menu > Accessories > DisWeb."
