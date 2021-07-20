@@ -1,6 +1,6 @@
 #!/bin/bash
 
 echo "Uninstalling DisWeb..."
-sudo rm -rf $HOME/.local/share/Discord-webapp-linux-armv7l
-sudo rm -rf $HOME/.local/share/applications/Discord.desktop
+sudo rm -rf $HOME/.local/share/DisWeb-linux-armv7l
+sudo rm -rf $HOME/.local/share/applications/DisWeb.desktop
 echo "Done!"
