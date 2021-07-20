@@ -3,13 +3,13 @@
 echo "Installing DisWeb..."
 mkdir -p $HOME/.local/share
 mkdir -p $HOME/.local/share/applications
-cd $HOME
-if [ -f "DisWeb-base.zip" ]; then
-  rm -rf DisWeb-base.zip
+if [ -f "$HOME/DisWeb-base.zip" ]; then
+  rm -rf $HOME/DisWeb-base.zip
 fi
+cd $HOME
 wget https://github.com/oxmc/diswebreleaseserver/releases/download/Base/DisWeb-base.zip
 sudo apt install -y unzip libnotify-bin at-spi2-core mate-notification-daemon mate-notification-daemon-common
-sudo unzip $HOME/DisWeb-base.zip -d $HOME/.local/share
+unzip $HOME/DisWeb-base.zip -d $HOME/.local/share
 echo "[Desktop Entry]
 Name=DisWeb
 Exec=$HOME/.local/share/DisWeb-linux-armv7l/DisWeb
