@@ -1,0 +1,32 @@
+{
+  "name": "disweb",
+  "version": "1.2.8",
+  "description": "A Discord Desktop app for linux, built with electron-builder.",
+  "main": "src/js/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-armv7l": "electron-builder --linux deb --armv7l"
+  },
+  "keywords": [
+    "Discord",
+    "linux",
+    "electron",
+    "webapp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oxmc/disweb.git"
+  },
+  "author": "oxmc",
+  "license": "MIT",
+  "dependencies": {
+    "decompress": "^4.2.1",
+    "electron": "^13.1.9",
+    "electron-builder": "^22.11.7",
+    "fs": "^0.0.1-security",
+    "node-notifier": "^10.0.0",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "request": "^2.88.2"
+  }
+}

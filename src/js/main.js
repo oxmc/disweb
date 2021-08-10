@@ -1,6 +1,5 @@
+//Load nodejs modules
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
-const widevine = require('electron-widevinecdm');
-widevine.load(app);
 const notifier = require('node-notifier');
 const path = require('path');
 const decompress = require("decompress");
@@ -18,11 +17,12 @@ function checkInternet(cb) {
     })
 }
 
+//Variables
 let SplashWindow;
 let UpdatingWindow;
 let mainWindow;
 let tray;
-const update =false;
+const update = false;
 
 function createWindow () {
   //Splash window
@@ -32,7 +32,7 @@ function createWindow () {
     frame: false,
     transparent: false,
     center: true,
-    icon: `${icondir}/app.${iconext}`,
+    icon: `${icondir}/app.png`,
     backgroundColor: '#23272A',
   });
   SplashWindow.loadFile(appdir + '/view/splash.html');
@@ -47,7 +47,7 @@ function createWindow () {
     frame: false,
     transparent: false,
     center: true,
-    icon: `${icondir}/app.${iconext}`,
+    icon: `${icondir}/app.png`,
     backgroundColor: '#23272A',
     webPreferences: {
       nodeIntegration: true,
@@ -63,20 +63,19 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1040,
     height: 900,
-    icon: `${icondir}/app.${iconext}`,
+    icon: `${icondir}/app.png`,
   });
   mainWindow.setMenuBarVisibility(false)
-  if (config.view.mode == "file") {
-    mainWindow.loadFile(appdir + '/view/index.html');
-  } else if (config.view.mode == "url") {
-    mainWindow.loadURL(config.view.url)
-  } else {
-    console.log("Error: Unknown mode given at config.view.mode");
-  }
+  mainWindow.loadURL(config.url)
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
   mainWindow.hide()
+}
+
+function seticon(arg) {
+  tray.setImage(`${icondir}/${arg}`);
+  mainWindow.setIcon(`${icondir}/${arg}`);
 }
 
 function Ready() {
@@ -93,67 +92,58 @@ function Ready() {
     mainWindow.webContents.on('page-favicon-updated', (event, favicons) => {
       //console.log(event);
       //console.log(favicons);
-      const fav1 = JSON.stringify(favicons);
-      const fav2 = fav1.replace(/\"/g, "");
-      const fav3 = fav2.replace(/\'/g, "");
-      const fav4 = fav3.replace(/\[/g, "");
-      const fav = fav4.replace(/\]/g, "");
+      const favstring = JSON.stringify(favicons);
+      const nojson1 = favstring.replace(/\"/g, "");
+      const nojson2 = nojson1.replace(/\'/g, "");
+      const nojson3 = nojson2.replace(/\[/g, "");
+      const fav = nojson3.replace(/\]/g, "");
       //console.log(fav);
+      for (let i = 0; i < 11; i++) {
+        console.log("Ping: "+pings[i])
+      }
       if (fav == pings.Badges.None) {
-        tray.setImage(`${icondir}/tray/tray-small.${iconext}`);
-        mainWindow.setIcon(`${icondir}/tray/tray-small.${iconext}`);
-        //console.log("Ping: None")
-      } else if (fav == pings.Badges.Active) {
-        tray.setImage(`${icondir}/tray/tray-ping.${iconext}`);
-        mainWindow.setIcon(`${icondir}/tray/tray-ping.${iconext}`);
-        //console.log("Ping: Unread")
-      } else if (fav == pings.Badges.one) {
-        tray.setImage(`${icondir}/ping/badge-1.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-1.${iconext}`);
-        //console.log("Ping: 1")
-      } else if (fav == pings.Badges.two) {
-        tray.setImage(`${icondir}/ping/badge-2.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-2.${iconext}`);
-        //console.log("Ping: 2")
-      } else if (fav == pings.Badges.three) {
-        tray.setImage(`${icondir}/ping/badge-3.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-3.${iconext}`);
-        //console.log("Ping: 3")
-      } else if (fav == pings.Badges.four) {
-        tray.setImage(`${icondir}/ping/badge-4.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-4.${iconext}`);
-        //console.log("Ping: 4")
-      } else if (fav == pings.Badges.five) {
-        tray.setImage(`${icondir}/ping/badge-5.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-5.${iconext}`);
-        //console.log("Ping: 5")
-      } else if (fav == pings.Badges.six) {
-        tray.setImage(`${icondir}/ping/badge-6.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-6.${iconext}`);
-        //console.log("Ping: 6")
-      } else if (fav == pings.Badges.seven) {
-        tray.setImage(`${icondir}/ping/badge-7.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-7.${iconext}`);
-        //console.log("Ping: 7")
-      } else if (fav == pings.Badges.eight) {
-        tray.setImage(`${icondir}/ping/badge-8.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-8.${iconext}`);
-        //console.log("Ping: 8")
-      } else if (fav == pings.Badges.nine) {
-        tray.setImage(`${icondir}/ping/badge-9.${iconext}`);
-        mainWindow.setIcon(`${icondir}/ping/badge-9.${iconext}`);
-        //console.log("Ping: 9")
-      } else if (fav == pings.Badges.ten) {
-        tray.setImage(`${icondir}/ping/badge-10.${iconext}`)
-        mainWindow.setIcon(`${icondir}/ping/badge-10.${iconext}`);
-        //console.log("Ping: 10");
+        seticon("tray/tray-small.png")
+        console.log("Ping: None")
+      } else if (fav == pings.Badges.Unread) {
+        seticon("tray/tray-ping.png")
+        console.log("Ping: Unread")
+      } else if (fav == pings.Badges.One) {
+        seticon("ping/badge-1.png")
+        console.log("Ping: 1")
+      } else if (fav == pings.Badges.Two) {
+        seticon("ping/badge-2.png")
+        console.log("Ping: 2")
+      } else if (fav == pings.Badges.Three) {
+        seticon("ping/badge-3.png")
+        console.log("Ping: 3")
+      } else if (fav == pings.Badges.Four) {
+        sseticon("ping/badge-4.png")
+        console.log("Ping: 4")
+      } else if (fav == pings.Badges.Five) {
+        seticon("ping/badge-5.png")
+        console.log("Ping: 5")
+      } else if (fav == pings.Badges.Six) {
+        seticon("ping/badge-6.png")
+        console.log("Ping: 6")
+      } else if (fav == pings.Badges.Seven) {
+        seticon("ping/badge-7.png")
+        console.log("Ping: 7")
+      } else if (fav == pings.Badges.Eight) {
+        seticon("ping/badge-8.png")
+        console.log("Ping: 8")
+      } else if (fav == pings.Badges.Nine) {
+        seticon("ping/badge-9.png")
+        console.log("Ping: 9")
+      } else if (fav == pings.Badges.Ten) {
+        seticon("ping/badge-10.png")
+        console.log("Ping: 9+");
       } else {
-        tray.setImage(`${icondir}/symbl/warning.${iconext}`);
-        //console.log("Ping: Unkown");
+        seticon("symbl/warning.png")
+        console.log("Ping: Unkown");
       }
     })
     app.on('browser-window-focus', () => {
-      tray.setImage(`${icondir}/tray/tray-ping.${iconext}`)
+      tray.setImage(`${icondir}/tray/tray-ping.png`)
     })
   }
 }
@@ -185,7 +175,7 @@ async function notification(mode, arg1) {
   } else if (mode == "3") {
     notifier.notify({
         title: 'Not connected.',
-        message: 'You are not connected to the internet, you can not use '+appname+' without the internet.',
+        message: `You are not connected to the internet, you can not use ${appname} without the internet.`,
         icon: icondir + '/symbl/warning.png',
         sound: true,
         wait: true
@@ -245,13 +235,13 @@ var appdir = path.join(app.getAppPath(), '/src');
 var icondir = path.join(appdir, '/icons');
 var appname = app.getName();
 var appversion = app.getVersion();
-const config = require(appdir + '/configs/config.json'); // Read the config
-const pings = require(appdir + '/configs/pings.json'); // Read the pings data
+const config = require(appdir + '/json/config.json'); // Read the config
+const pings = require(appdir + '/json/pings.json'); // Read the pings data
 var packageJson = require(app.getAppPath() + '/package.json') // Read package.json
 var repoLink = packageJson.repository.url
 var webLink = repoLink.substring(repoLink.indexOf("+")+1)
 var serverVerUrl = config.serververurl
-var serverUrl = config.serverurl
+
 
 ipcMain.on('synchronous-message', (event, arg) => {
   if (arg.notif == "2") {
@@ -267,7 +257,7 @@ ipcMain.on('synchronous-message', (event, arg) => {
 console.log('appname: ' + appname);
 //console.log('appversion: ' + appversion);
 console.log('appdir: ' + appdir);
-console.log('configdir: ' + appdir + "/configs");
+console.log('jsondir: ' + appdir + "/json");
 console.log('icondir: ' + icondir);
 
 //Main
@@ -278,9 +268,9 @@ checkInternet(function(isConnected) {
       console.log("Initilize Updater:");
       request(serverVerUrl, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-          var verf = JSON.parse(body);
-          const verstring = JSON.stringify(verf);
-          const ver = verf.version;
+          var verfile = JSON.parse(body);
+          const verstring = JSON.stringify(verfile);
+          const ver = verfile.version;
           const onlineversion = ver.replace(/"([^"]+)":/g, '$1:');
           console.log("Online version: '" + onlineversion + "'");
           console.log("Local version: '" + appversion + "'");
@@ -308,7 +298,7 @@ checkInternet(function(isConnected) {
     }
 });
 
-var contrib = require(appdir + '/contributors.json') // Read contributors.json
+var contrib = require(appdir + '/json/contributors.json') // Read contributors.json
 
 // "About" information
 var appAuthor = packageJson.author

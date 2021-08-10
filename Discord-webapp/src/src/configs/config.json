@@ -1,9 +1,0 @@
-{
-  "view": {
-    "mode": "url",
-    "url": "https://discord.com/app/"
-  },
-  "madefor": "Pi-Ware",
-  "serververurl": "https://raw.githubusercontent.com/oxmc/disweb/master/Discord-webapp/package.json",
-  "serverurl": "https://oxmc.github.io/diswebreleaseserver/latest/Discord-armv7l/src.zip"
-}
