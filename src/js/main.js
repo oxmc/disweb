@@ -98,9 +98,6 @@ function Ready() {
       const nojson3 = nojson2.replace(/\[/g, "");
       const fav = nojson3.replace(/\]/g, "");
       //console.log(fav);
-      for (let i = 0; i < 11; i++) {
-        console.log("Ping: "+pings[i])
-      }
       if (fav == pings.Badges.None) {
         seticon("tray/tray-small.png")
         console.log("Ping: None")
