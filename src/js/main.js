@@ -151,7 +151,7 @@ function Ready() {
       */
     })
     app.on('browser-window-focus', () => {
-      tray.setImage(`${icondir}/tray/tray-ping.png`)
+      seticon('favicon.png')
     })
   }
 }
