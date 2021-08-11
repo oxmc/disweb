@@ -5,6 +5,7 @@ const path = require('path');
 const decompress = require("decompress");
 var request = require('request');
 var os = require('os');
+var fs = require('fs');
 
 //Functions
 function checkInternet(cb) {
@@ -96,8 +97,17 @@ function Ready() {
       const nojson1 = favstring.replace(/\"/g, "");
       const nojson2 = nojson1.replace(/\'/g, "");
       const nojson3 = nojson2.replace(/\[/g, "");
-      const fav = nojson3.replace(/\]/g, "");
-      //console.log(fav);
+      const nobase64 = nojson3.replace(/\]/g, "");
+      //const fav = nobase64
+      const fav2 = nobase64.replace(/^data:image\/png;base64,/,"")
+      var buf = new Buffer(fav2, 'base64');
+      fs.writeFile(icondir+'/favicon.png', buf, 'base64', function(err) {
+        console.log(err);
+      });
+      setTimeout(async function () {
+        seticon('favicon.png')
+      }, 2000)
+      /*
       if (fav == pings.Badges.None) {
         seticon("tray/tray-small.png")
         console.log("Ping: None")
@@ -138,6 +148,7 @@ function Ready() {
         seticon("symbl/warning.png")
         console.log("Ping: Unkown");
       }
+      */
     })
     app.on('browser-window-focus', () => {
       tray.setImage(`${icondir}/tray/tray-ping.png`)
