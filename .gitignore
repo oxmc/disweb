@@ -21,6 +21,10 @@ lib-cov
 #Mac files
 .DS_Store
 
+#Dev files
+install
+uninstall
+
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
