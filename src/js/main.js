@@ -101,9 +101,7 @@ function Ready() {
       //const fav = nobase64
       const fav2 = nobase64.replace(/^data:image\/png;base64,/,"")
       var buf = new Buffer(fav2, 'base64');
-      fs.writeFile(icondir+'/favicon.png', buf, 'base64', function(err) {
-        console.log(err);
-      });
+      fs.writeFile(icondir+'/favicon.png', buf, 'base64');
       setTimeout(async function () {
         seticon('favicon.png')
       }, 2000)
