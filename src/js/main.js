@@ -75,8 +75,8 @@ function createWindow () {
 }
 
 function seticon(arg) {
-  tray.setImage(`${icondir}/${arg}`);
-  mainWindow.setIcon(`${icondir}/${arg}`);
+  tray.setImage(`${arg}`);
+  mainWindow.setIcon(`${arg}`);
 }
 
 function Ready() {
@@ -101,58 +101,17 @@ function Ready() {
       //const fav = nobase64
       const fav2 = nobase64.replace(/^data:image\/png;base64,/,"")
       var buf = new Buffer(fav2, 'base64');
-      fs.writeFile(icondir+'/favicon.png', buf, 'base64', function(err) {
+      
+      fs.writeFile(`${userHomeDir}/.config/${appname}/downloads/icons/favicon.png`, buf, 'base64', function(err) {
         console.log(err)
       });
       setTimeout(async function () {
-        seticon('favicon.png')
+        seticon(`${userHomeDir}/.config/${appname}/downloads/icons/favicon.png`)
       }, 2000)
-      /*
-      if (fav == pings.Badges.None) {
-        seticon("tray/tray-small.png")
-        console.log("Ping: None")
-      } else if (fav == pings.Badges.Unread) {
-        seticon("tray/tray-ping.png")
-        console.log("Ping: Unread")
-      } else if (fav == pings.Badges.One) {
-        seticon("ping/badge-1.png")
-        console.log("Ping: 1")
-      } else if (fav == pings.Badges.Two) {
-        seticon("ping/badge-2.png")
-        console.log("Ping: 2")
-      } else if (fav == pings.Badges.Three) {
-        seticon("ping/badge-3.png")
-        console.log("Ping: 3")
-      } else if (fav == pings.Badges.Four) {
-        sseticon("ping/badge-4.png")
-        console.log("Ping: 4")
-      } else if (fav == pings.Badges.Five) {
-        seticon("ping/badge-5.png")
-        console.log("Ping: 5")
-      } else if (fav == pings.Badges.Six) {
-        seticon("ping/badge-6.png")
-        console.log("Ping: 6")
-      } else if (fav == pings.Badges.Seven) {
-        seticon("ping/badge-7.png")
-        console.log("Ping: 7")
-      } else if (fav == pings.Badges.Eight) {
-        seticon("ping/badge-8.png")
-        console.log("Ping: 8")
-      } else if (fav == pings.Badges.Nine) {
-        seticon("ping/badge-9.png")
-        console.log("Ping: 9")
-      } else if (fav == pings.Badges.Ten) {
-        seticon("ping/badge-10.png")
-        console.log("Ping: 9+");
-      } else {
-        seticon("symbl/warning.png")
-        console.log("Ping: Unkown");
-      }
-      */
-    })
+    });
     app.on('browser-window-focus', () => {
-      seticon('favicon.png')
-    })
+      seticon(`${userHomeDir}/.config/${appname}/downloads/icons/favicon.png`)
+    });
   }
 }
 
@@ -194,9 +153,6 @@ async function notification(mode, arg1) {
         }
       }
     );
-    SplashWindow.hide();
-    mainWindow.loadFile(appdir + '/view/nowifi.html');
-    mainWindow.show();
   } else if (mode == "4") {
     notifier.notify({
         title: 'Error downloading.',
@@ -244,14 +200,16 @@ var icondir = path.join(appdir, '/icons');
 var appname = app.getName();
 var appversion = app.getVersion();
 const config = require(appdir + '/json/config.json'); // Read the config
-const pings = require(appdir + '/json/pings.json'); // Read the pings data
 var packageJson = require(app.getAppPath() + '/package.json') // Read package.json
+var contrib = require(appdir + '/json/contributors.json') // Read contributors.json
 var repoLink = packageJson.repository.url
 var webLink = repoLink.substring(repoLink.indexOf("+")+1)
 var serverVerUrl = config.serververurl
+const userHomeDir = os.homedir();
 
-
+//Update window sends signals to main.js
 ipcMain.on('synchronous-message', (event, arg) => {
+  //Deal weith response
   if (arg.notif == "2") {
     notification(2);
   } else if (arg.notif == "4") {
@@ -269,8 +227,91 @@ console.log('jsondir: ' + appdir + "/json");
 console.log('icondir: ' + icondir);
 
 //Main
-//Check if user is connected to the internet.
-checkInternet(function(isConnected) {
+//Make required dirs
+const faviconpath = `${userHomeDir}/.config/${appname}/downloads/icons`
+try {
+  if (fs.existsSync(`${userHomeDir}/.config/${appname}`)) {
+    fs.copyFileSync(`${icondir}/app.png`, `${userHomeDir}/.config/${appname}/app.png`);
+  }
+}
+catch {
+  faviconpath.split('/').reduce(
+    (directories, directory) => {
+      directories += `${directory}/`;
+
+      if (!fs.existsSync(directories)) {
+        fs.mkdirSync(directories);
+      }
+
+      return directories;
+   },
+  '',
+  );
+}
+finally {
+  fs.copyFileSync(`${icondir}/app.png`, `${userHomeDir}/.config/${appname}/app.png`);
+}
+
+// "About" information
+var appAuthor = packageJson.author.name
+
+if (Array.isArray(contrib.contributors) && contrib.contributors.length) {
+  var appContributors = [ appAuthor, ...contrib.contributors ]
+  var stringContributors = appContributors.join(', ')
+} else {
+  var stringContributors = appAuthor
+}
+
+var appYear = '2021' // the year since this app exists
+var currentYear = new Date().getFullYear()
+
+// Year format for copyright
+if (appYear == currentYear){
+  var copyYear = appYear
+} else {
+  var copyYear = `${appYear}-${currentYear}`
+}
+
+const createTray = () => {
+  if (typeof config.madefor === 'undefined') {
+    var credittext = stringContributors
+    var trayMenuTemplate = [
+            { label: appname, enabled: false },
+	    { label: "Open source on github!", enabled: false},
+            { type: 'separator' },
+	    { label: 'About', role: 'about', click: function() { app.showAboutPanel();}},
+	    { label: 'Quit', role: 'quit', click: function() { app.quit();}}
+         ]
+  } else {
+    var trayMenuTemplate = [
+            { label: appname, enabled: false },
+	    { label: "Made for: " + config.madefor, enabled: false},
+            { type: 'separator' },
+	    { label: 'About', role: 'about', click: function() { app.showAboutPanel();}},
+	    { label: 'Quit', role: 'quit', click: function() { app.quit();}}
+         ]
+    var credittext = stringContributors
+  }
+  tray = new Tray(path.join(icondir, '/tray/tray-icon.png'))
+  let trayMenu = Menu.buildFromTemplate(trayMenuTemplate)
+  tray.setContextMenu(trayMenu)
+  const aboutWindow = app.setAboutPanelOptions({
+	  applicationName: appname,
+	  iconPath: `${userHomeDir}/.config/${appname}/app.png`,
+	  applicationVersion: 'Version: ' + appversion,
+	  authors: appContributors,
+	  website: webLink,
+	  credits: 'Credits: ' + credittext,
+	  copyright: 'Copyright © ' + copyYear + ' ' + appAuthor
+  })
+  return aboutWindow
+}
+
+app.on('ready', () => {
+  createWindow();
+  createTray()
+  //Check if user is connected to the internet.
+  checkInternet(function(isConnected) {
     if (isConnected) {
       //Get latest version from GitHub.
       console.log("Initilize Updater:");
@@ -285,15 +326,21 @@ checkInternet(function(isConnected) {
           //If Online version is greater than local version, show update dialog.
           if (onlineversion > appversion) {
             console.log("\x1b[1m", "\x1b[31m", "Version is not up to date!", "\x1b[0m");
-            update = true;
             notification(1);
             mainWindow.close();
             SplashWindow.close();
-            UpdatingWindow.show()
-            return update
+            //UpdatingWindow.show()
           } else {
             console.log("\x1b[1m", "\x1b[32m", "Version is up to date!", "\x1b[0m");
             SplashWindow.show();
+            mainWindow.hide();
+            UpdatingWindow.hide()
+            // Close loading screen after, loading...
+            mainWindow.webContents.once('did-finish-load', () => {
+              setTimeout(async function () {
+                Ready();
+              }, 2000)
+            })
           }
         } else if (!error && response.statusCode == 404) {
           console.log("\x1b[1m", "\x1b[31m", "Unable to check latest version from main server!\nIt may be because the server is down, moved, or does not exist.", "\x1b[0m");
@@ -303,77 +350,12 @@ checkInternet(function(isConnected) {
       //User not connected
       console.log("\x1b[1m", "\x1b[31m", "ERROR: User is not connected to internet, showing NotConnectedNotification", "\x1b[0m");
       notification(3);
+      SplashWindow.close();
+      UpdatingWindow.close();
+      mainWindow.loadFile(appdir + '/view/nowifi.html');
+      mainWindow.show();
     }
-});
-
-var contrib = require(appdir + '/json/contributors.json') // Read contributors.json
-
-// "About" information
-var appAuthor = packageJson.author
-
-if (Array.isArray(contrib.contributors) && contrib.contributors.length) {
-	var appContributors = [ appAuthor, ...contrib.contributors ]
-  var stringContributors = appContributors.join(', ')
-} else {
-  var stringContributors = appAuthor
-}
-
-var iconext = "png" //Set default iconext to png
-
-var appYear = '2021' // the year since this app exists
-var currentYear = new Date().getFullYear()
-
-// Year format for copyright
-if (appYear == currentYear){
-	var copyYear = appYear
-} else {
-	var copyYear = `${appYear}-${currentYear}`
-}
-
-const createTray = () => {
-  if (typeof config.madefor === 'undefined') {
-    var credittext = stringContributors
-    var trayMenuTemplate = [
-            { label: appname, enabled: false },
-	          { label: "Open source on github!", enabled: false},
-            { type: 'separator' },
-	          { label: 'About', role: 'about', click: function() { app.showAboutPanel();}},
-	          { label: 'Quit', role: 'quit', click: function() { app.quit();}}
-         ]
-  } else {
-    var trayMenuTemplate = [
-            { label: appname, enabled: false },
-	          { label: "Made for: " + config.madefor, enabled: false},
-            { type: 'separator' },
-	          { label: 'About', role: 'about', click: function() { app.showAboutPanel();}},
-	          { label: 'Quit', role: 'quit', click: function() { app.quit();}}
-         ]
-    var credittext = stringContributors
-  }
-  tray = new Tray(path.join(icondir, '/tray/tray-icon.png'))
-  let trayMenu = Menu.buildFromTemplate(trayMenuTemplate)
-  tray.setContextMenu(trayMenu)
-  const aboutWindow = app.setAboutPanelOptions({
-	  applicationName: appname,
-	  iconPath: icondir + '/tray/tray-small.' + iconext,
-	  applicationVersion: 'Version: ' + appversion,
-	  authors: appContributors,
-	  website: webLink,
-	  credits: 'Credits: ' + credittext,
-	  copyright: 'Copyright © ' + copyYear + ' ' + appAuthor
-  })
-  return aboutWindow
-}
-
-app.on('ready', () => {
-  createWindow();
-  createTray()
-  UpdatingWindow.hide()
-  mainWindow.hide();
-  // Close loading screen after, loading...
-  mainWindow.webContents.once('did-finish-load', () => {
-    Ready();
-  })
+  });
 });
 
 app.on('window-all-closed', function () {

@@ -1,6 +1,6 @@
 {
-  "name": "disweb",
-  "version": "1.2.8",
+  "name": "DisWeb",
+  "version": "2.0.5",
   "description": "A Discord Desktop app for linux, built with electron-builder.",
   "main": "src/js/main.js",
   "scripts": {
@@ -11,7 +11,8 @@
   "build": {
     "linux": {
       "target": "appimage",
-      "icon": "build/app.png"
+      "icon": "build/app.png",
+      "category": "Network"
     }
   },
   "keywords": [
